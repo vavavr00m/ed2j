@@ -2,9 +2,8 @@ package ed2k.server.conn;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.Random;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -24,8 +23,6 @@ import ed2k.server.message.MessageReader;
 import ed2k.server.misc.Toolbox;
 import ed2k.server.util.Ed2kInputStream;
 
-import java.util.TreeMap;
-
 public class ConnImpl extends AbstractConn {
 	public ConnImpl(Socket s) throws IOException {
 		super(s);
@@ -42,7 +39,7 @@ public class ConnImpl extends AbstractConn {
 			shutdown(null, null);
 			return;
 		}
-		if (!Boolean.FALSE.equals(map.get("isHello"))) {
+		if (!Boolean.FALSE.equals(Boolean.valueOf(String.valueOf(map.get("isHello"))))) {
 			ubyte[] client_id = ubyte.parseOneDArray(socket.getLocalAddress().getAddress());
 			ubyte[] port = Toolbox.int2UBytes(socket.getLocalPort());
 			map.put("UserHash", UserHash.generate());
@@ -71,8 +68,7 @@ public class ConnImpl extends AbstractConn {
 		if (high_id) {
 			client_id = ubyte.parseOneDArray(socket.getInetAddress().getAddress());
 		} else {
-			Random r = new Random();
-			client_id = new ubyte[] { new ubyte(r.nextInt(256)), new ubyte(r.nextInt(256)), new ubyte(r.nextInt(256)), new ubyte(0) };
+			client_id = new ubyte[] { ubyte.rand(), ubyte.rand(), ubyte.rand(), ubyte.valueOf(0) };
 		}
 
 		map.put("Client ID", client_id);
@@ -104,7 +100,7 @@ public class ConnImpl extends AbstractConn {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println("client id :" + Arrays.toString(client_id) + " disconnected!");
+		System.out.println("client :" + Toolbox.toDemicalString(client_id) + " disconnected!");
 		Manager.delRes(client);
 	}
 }

@@ -10,7 +10,6 @@ import ed2k.server.data_stru.ubyte;
 import ed2k.server.encoder.Encoder;
 import ed2k.server.message.MessageTag;
 import ed2k.server.misc.Toolbox;
-import ed2k.server.misc.UByteCharSeq;
 
 public class Login implements Encoder {
 
@@ -24,30 +23,30 @@ public class Login implements Encoder {
 	public Map<String, Object> decode(ubyte[] b) {
 		Map<String, Object> map = new TreeMap<String, Object>();
 		UByteQueue q = new UByteQueue(b);
-		q.poll();//message type;
+		q.poll();// message type;
 		map.put("UserHash", new UserHash(q.pollSome(16)));
 		map.put("Client ID", q.pollSome(4));
 		map.put("Client Port", q.pollSome(2));
 		map.put("isHello", Boolean.FALSE);
 		int tag_count = Toolbox.byte2Integer(q.pollSome(4));
-		for(int i=0;i<tag_count;i++){
+		for (int i = 0; i < tag_count; i++) {
 			MessageTag tag = new MessageTag();
 			tag.setType(q.poll());
 			q.pollSome(2);
 			tag.setName(q.poll());
-			if(tag.getType().equals(MessageTag.STRING_TAG)){
+			if (tag.getType().equals(MessageTag.STRING_TAG)) {
 				int len = Toolbox.byte2Integer(q.pollSome(2));
 				ubyte[] arr = q.pollSome(len);
-				byte[] barray=ubyte.toBytes(arr);
+				byte[] barray = ubyte.toBytes(arr);
 				try {
-					tag.setText(new String(barray,"utf8"));
+					tag.setText(new String(barray, "utf8"));
 				} catch (UnsupportedEncodingException e) {
 					tag.setText(new String(barray));
 				}
-			}else{
+			} else {
 				tag.setNum(Toolbox.byte2Integer(q.pollSome(4)));
 			}
-			if(tag.getName().intValue()==1){
+			if (tag.getName().intValue() == 1) {
 				map.put("Nickname", tag.getText());
 			}
 		}
@@ -64,9 +63,9 @@ public class Login implements Encoder {
 		int size = 56 + name_tag_ubyte.length;
 		ubyte[] data = ubyte.newArray(size);
 		System.arraycopy(name_tag_ubyte, 0, data, 32, name_tag_ubyte.length);
-		data[0] = new ubyte(0xe3);
-		data[5] = new ubyte(1);
-		data[28] = new ubyte(4);
+		data[0] = ubyte.valueOf(0xe3);
+		data[5] = ubyte.valueOf(1);
+		data[28] = ubyte.valueOf(4);
 		ubyte[] usize = ubyte.parseOneDArray(Toolbox.int2Bytes(size - 5));
 		System.arraycopy(usize, 0, data, 1, Math.min(usize.length, 4));
 		ubyte[] user_hash = ((UserHash) p.get("UserHash")).getBytes();

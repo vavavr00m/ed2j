@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import ed2k.server.misc.Toolbox;
 
-public class SourceItem{
+public class SourceItem {
 	public final ubyte[] client_id;
 	public final ubyte[] client_port;
 
@@ -42,17 +42,13 @@ public class SourceItem{
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("SourceItem [");
 		if (client_id != null) {
-			builder.append("client_id=");
-			builder.append(Arrays.toString(client_id));
-			builder.append(", ");
+			builder.append(Toolbox.toDemicalString(client_id));
 		}
+		builder.append(':');
 		if (client_port != null) {
-			builder.append("client_port=");
 			builder.append(Toolbox.byte2Integer(client_port));
 		}
-		builder.append("]");
 		return builder.toString();
 	}
 }

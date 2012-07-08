@@ -38,7 +38,8 @@ public class Toolbox {
 	}
 
 	public static int byte2Integer(ubyte[] b) {
-		if(b==null)return 0;
+		if (b == null)
+			return 0;
 		int result = 0;
 		for (int i = 0; i < b.length; i++) {
 			result += b[i].intValue() * Math.pow(256, i);
@@ -47,7 +48,13 @@ public class Toolbox {
 	}
 
 	public static byte[] int2Bytes(int a) {
+		if (a == 0) {
+			return new byte[] { 0 };
+		}
 		byte[] data = new byte[(int) Math.ceil(Math.log(a) / Math.log(256))];
+		if (data.length < 1) {
+			data = new byte[1];
+		}
 		int j = a;
 		int i = 0;
 		while (j > 0) {
@@ -57,6 +64,7 @@ public class Toolbox {
 		}
 		return data;
 	}
+
 	public static ubyte[] int2UBytes(int a) {
 		byte[] b = int2Bytes(a);
 		return ubyte.parseOneDArray(b);
@@ -162,24 +170,22 @@ public class Toolbox {
 		return (byte) (hex2int(hi) * 16 + hex2int(lo) - 128);
 	}
 
-	public static String toDemicalString(ubyte[] ub){
+	public static String toDemicalString(ubyte[] ub) {
 		StringBuilder sb = new StringBuilder();
-		for(ubyte b:ub){
+		for (ubyte b : ub) {
 			sb.append(b.intValue());
 			sb.append('.');
 		}
-		if(ub.length>0){
-			sb.deleteCharAt(sb.length()-1);
+		if (ub.length > 0) {
+			sb.deleteCharAt(sb.length() - 1);
 		}
 		return sb.toString();
-	} 
-	
-	public static String toStringBytes(ubyte[] b) {
+	}
+
+	public static String toStringBytes(ubyte[] b, boolean bigEndian) {
 		StringBuilder sb = new StringBuilder();
-		for (ubyte ub : b) {
-			int i = ub.intValue();
-			sb.append(int2hex(i / 16));
-			sb.append(int2hex(i % 16));
+		for (ubyte u : b) {
+			sb.append(u.toHex(bigEndian));
 		}
 		return sb.toString();
 	}
@@ -192,15 +198,17 @@ public class Toolbox {
 			e.printStackTrace();
 		}
 	}
+
 	public static Map<String, Object> receive(Encoder en, InputStream in) {
-		return receive(en,in,5000);
+		return receive(en, in, 5000);
 	}
-	public static Map<String, Object> receive(Encoder en, InputStream in,long timeout) {
+
+	public static Map<String, Object> receive(Encoder en, InputStream in, long timeout) {
 		Map<String, Object> result = new TreeMap<String, Object>();
 		try {
-			while (timeout>0) {
+			while (timeout > 0) {
 				Thread.sleep(100);
-				timeout-=100;
+				timeout -= 100;
 				int size = in.available();
 				if (size <= 0)
 					continue;

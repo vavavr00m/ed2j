@@ -2,16 +2,15 @@ package ed2k.server.data_stru;
 
 import java.util.Arrays;
 
-public class FileHash{
+import ed2k.server.misc.Toolbox;
+
+public class FileHash {
 
 	private final ubyte[] id;
-	private final transient int hash;
-	private transient String str = null;
 
 	public FileHash(ubyte[] id) {
 		super();
 		this.id = id;
-		hash = Arrays.hashCode(id);
 	}
 
 	public ubyte[] getId() {
@@ -20,10 +19,8 @@ public class FileHash{
 
 	@Override
 	public int hashCode() {
-		return hash;
+		return Arrays.hashCode(id);
 	}
-
-
 
 	@Override
 	public boolean equals(Object obj) {
@@ -41,14 +38,7 @@ public class FileHash{
 
 	@Override
 	public String toString() {
-		if(str==null){
-			StringBuilder sb = new StringBuilder();
-			for(ubyte u:id){
-				sb.append(u.toHex());
-			}
-			str = sb.toString();
-		}
-		return str;
+		return Toolbox.toStringBytes(id, true);
 	}
-	
+
 }
