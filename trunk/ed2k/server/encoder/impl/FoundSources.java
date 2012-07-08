@@ -37,12 +37,12 @@ public class FoundSources implements Encoder {
 		@SuppressWarnings("unchecked")
 		Collection<SourceItem> sources = (Collection<SourceItem>) m.get("Sources");
 		ubyte[] data = ubyte.newArray(23 + sources.size() * 6);
-		data[0] = new ubyte(0xe3);
+		data[0] = ubyte.valueOf(0xe3);
 		ubyte[] x = ubyte.parseOneDArray(Toolbox.int2Bytes(18 + sources.size() * 6));
 		System.arraycopy(x, 0, data, 1, x.length);
-		data[5] = new ubyte(0x42);
-		System.arraycopy((ubyte[]) m.get("FileHash"), 0, data, 6, 16);
-		data[22] = new ubyte(sources.size());
+		data[5] = ubyte.valueOf(0x42);
+		System.arraycopy(m.get("FileHash"), 0, data, 6, 16);
+		data[22] = ubyte.valueOf(sources.size());
 		int i = 0;
 		for (SourceItem item : sources) {
 			System.arraycopy(item.client_id, 0, data, 23 + i * 6, 4);

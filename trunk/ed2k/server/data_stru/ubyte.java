@@ -1,26 +1,43 @@
 package ed2k.server.data_stru;
 
-import ed2k.server.misc.Toolbox;
+import static ed2k.server.misc.Toolbox.hex2int;
+import static ed2k.server.misc.Toolbox.int2hex;
 
-public class ubyte extends Number implements Comparable<ubyte>,Cloneable{
+public class ubyte extends Number implements Comparable<ubyte> {
 
+	private static final ubyte[] VALUE = new ubyte[256];
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -8932816268190356866L;
 	private final byte value;
-	public ubyte(byte b) {
-		value = b;
+
+	private ubyte(int val) {
+		if (val > 127)
+			val -= 256;
+		value = (byte) val;
 	}
-	public ubyte(int value) {
-		int v1 = value%256;
-		if(v1>127)v1-=256;
-		this.value = (byte) v1;
+
+	public static ubyte rand() {
+		return ubyte.valueOf((int) (Math.random() * 256));
 	}
+
+	public static ubyte valueOf(int value) {
+		int val = value % 256;
+		if (val < 0) {
+			val += 256;
+		}
+		if (VALUE[val] == null) {
+			VALUE[val] = new ubyte((byte) val);
+		}
+		return VALUE[val];
+	}
+
 	@Override
 	public int hashCode() {
 		return value;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -34,68 +51,81 @@ public class ubyte extends Number implements Comparable<ubyte>,Cloneable{
 			return false;
 		return true;
 	}
+
 	@Override
 	public String toString() {
-		String s = Integer.toHexString(intValue());
-		return s.length()<2?"0"+s:s;
+		return toHex(false);
 	}
+
 	@Override
 	public byte byteValue() {
 		return value;
 	}
+
 	@Override
 	public int intValue() {
-		int v1 = value;
-		if(v1<0)v1+=256;
-		return v1;
+		return value < 0 ? value + 256 : value;
 	}
+
 	@Override
 	public long longValue() {
 		return intValue();
 	}
+
 	@Override
 	public float floatValue() {
 		return intValue();
 	}
+
 	@Override
 	public double doubleValue() {
 		return intValue();
 	}
+
 	@Override
 	public int compareTo(ubyte o) {
-		return intValue()-o.intValue();
+		return intValue() - o.intValue();
 	}
-	@Override
-	protected ubyte clone(){
-		return new ubyte(value);
-	}
-	public String toHex(){
+
+	public String toHex(boolean bigEndian) {
 		int i = intValue();
 		int hi = i / 16;
 		int lo = i % 16;
-		return new String(new char[] { Toolbox.int2hex(lo), Toolbox.int2hex(hi) });
+		if (bigEndian) {
+			return new String(new char[] { int2hex(hi), int2hex(lo) });
+		} else {
+			return new String(new char[] { int2hex(lo), int2hex(hi) });
+		}
 	}
-	public static ubyte parseUbyte(String str){
-		return new ubyte(Toolbox.hex2int(str.charAt(0))*256+Toolbox.hex2int(str.charAt(1)));
+
+	public static ubyte valueOf(String str, boolean bigEndian) {
+		if (bigEndian) {
+			return ubyte.valueOf(hex2int(str.charAt(0)) * 16 + hex2int(str.charAt(1)));
+		} else {
+			return ubyte.valueOf(hex2int(str.charAt(1)) * 16 + hex2int(str.charAt(0)));
+		}
 	}
-	public static ubyte[] parseOneDArray(byte[] b){
+
+	public static ubyte[] parseOneDArray(byte[] b) {
 		ubyte[] data = new ubyte[b.length];
-		for(int i=0;i<b.length;i++){
-			data[i]=new ubyte(b[i]);
+		for (int i = 0; i < b.length; i++) {
+			data[i] = ubyte.valueOf(b[i]);
 		}
 		return data;
 	}
-	public static ubyte[] newArray(int size){
+
+	public static ubyte[] newArray(int size) {
 		ubyte[] array = new ubyte[size];
-		for(int i=0;i<size;i++){
-			array[i]= new ubyte(0);
+		for (int i = 0; i < size; i++) {
+			array[i] = ubyte.valueOf(0);
 		}
 		return array;
 	}
-	public static byte[] toBytes(ubyte[] ub){
+
+	public static byte[] toBytes(ubyte[] ub) {
 		byte[] data = new byte[ub.length];
-		for(int i=0;i<ub.length;i++){
-			data[i]=ub[i]==null?0:ub[i].value;
+		for (int i = 0; i < ub.length; i++) {
+			data[i] = ub[i] == null ? 0 : ub[i].value;
 		}
 		return data;
 	}

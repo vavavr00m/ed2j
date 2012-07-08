@@ -12,8 +12,8 @@ public class IDchange implements Encoder {
 	}
 
 	@Override
-	public Map<String,Object> decode(ubyte[] b) {
-		Map<String,Object> map = new TreeMap<String,Object>();
+	public Map<String, Object> decode(ubyte[] b) {
+		Map<String, Object> map = new TreeMap<String, Object>();
 		ubyte[] client_id = new ubyte[4];
 		System.arraycopy(b, 6, client_id, 0, 4);
 		map.put("Client ID", client_id);
@@ -21,11 +21,11 @@ public class IDchange implements Encoder {
 	}
 
 	@Override
-	public ubyte[] encode(Map<String,Object> map) {
+	public ubyte[] encode(Map<String, Object> map) {
 		ubyte[] data = ubyte.newArray(10);
-		data[0]=new ubyte(0xE3);
-		data[1]=new ubyte(5);
-		data[5]=new ubyte(0x40);
+		data[0] = ubyte.valueOf(0xE3);
+		data[1] = ubyte.valueOf(5);
+		data[5] = ubyte.valueOf(0x40);
 		ubyte[] id = (ubyte[]) map.get("Client ID");
 		System.arraycopy(id, 0, data, 6, 4);
 		return data;

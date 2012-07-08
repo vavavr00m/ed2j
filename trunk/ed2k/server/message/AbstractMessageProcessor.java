@@ -25,7 +25,6 @@ public abstract class AbstractMessageProcessor implements MessageProcessor {
 	protected final Client client;
 	protected final OutputStream out;
 	protected final ubyte[] address;
-	protected static final ubyte[] localhost = new ubyte[] { new ubyte(127), new ubyte(0), new ubyte(0), new ubyte(1) };
 
 	public AbstractMessageProcessor(Client client, OutputStream out, ubyte[] address) {
 		this.out = out;
@@ -37,6 +36,7 @@ public abstract class AbstractMessageProcessor implements MessageProcessor {
 		System.arraycopy(client_port, 0, id_and_port, 4, 2);
 	}
 
+	@Override
 	public void processMessage(ubyte[] data) {
 		int type = data[0].intValue();
 		switch (type) {
@@ -62,9 +62,9 @@ public abstract class AbstractMessageProcessor implements MessageProcessor {
 	}
 
 	protected void processHello(ubyte[] data) {
-		Map<String,Object> map = new Hello().decode(recover(data));
-		client_id = (ubyte[])map.get("Client ID");
-		client_port = (ubyte[])map.get("Client Port");
+		Map<String, Object> map = new Hello().decode(recover(data));
+		client_id = (ubyte[]) map.get("Client ID");
+		client_port = (ubyte[]) map.get("Client Port");
 		System.arraycopy(client_id, 0, id_and_port, 0, 4);
 		System.arraycopy(client_port, 0, id_and_port, 4, 2);
 		System.arraycopy(client_id, 0, client.getSource().client_id, 0, 4);
@@ -80,7 +80,7 @@ public abstract class AbstractMessageProcessor implements MessageProcessor {
 		System.arraycopy(data, 1, id, 0, 4);
 		client_id = id;
 		System.arraycopy(id, 0, id_and_port, 0, 4);
-		System.out.println("ID Changed!\t"+Arrays.toString(id));
+		System.out.println("ID Changed!\t" + Arrays.toString(id));
 	}
 
 	private void processUnknown(ubyte[] data) {
@@ -149,8 +149,8 @@ public abstract class AbstractMessageProcessor implements MessageProcessor {
 
 			FileHash fh = new FileHash(hashCode);
 			System.out.print("file added:" + filename + "\t" + fh);
-			System.out.print("\t"+Toolbox.toDemicalString(client_id));
-			System.out.println(":"+Toolbox.byte2Integer(client_port));
+			System.out.print("\t" + Toolbox.toDemicalString(client_id));
+			System.out.println(":" + Toolbox.byte2Integer(client_port));
 			offerFile(fh, filename, file_size);
 		}
 	}
@@ -159,7 +159,7 @@ public abstract class AbstractMessageProcessor implements MessageProcessor {
 
 	protected ubyte[] recover(ubyte[] data) {
 		ubyte[] data1 = ubyte.newArray(data.length + 5);
-		data1[0] = new ubyte(0xe3);
+		data1[0] = ubyte.valueOf(0xe3);
 		ubyte[] size = Toolbox.int2UBytes(data.length);
 		System.arraycopy(size, 0, data1, 1, size.length);
 		System.arraycopy(data, 0, data1, 5, data.length);
